@@ -1,5 +1,6 @@
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
+import { HeroSection } from "@/components/landing/hero-section";
 
 export default function Page() {
   return (
@@ -14,8 +15,8 @@ export default function Page() {
       <Header />
 
       <main id="main-content" tabIndex={-1}>
-        {/* <HeroSection />
-        <CategorySection />
+        <HeroSection />
+        {/* <CategorySection />
         <FeaturedItemsSection />
         <HowItWorksSection />
         <WhyCampusGearSection />
