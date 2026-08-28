@@ -1,3 +1,4 @@
+import { CategorySection } from "@/components/landing/category-section";
 import { CommunitySection } from "@/components/landing/community-section";
 import { CTASection } from "@/components/landing/cta-section";
 import { Footer } from "@/components/landing/footer";
@@ -18,8 +19,8 @@ export default function Page() {
 
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
-        {/* <CategorySection />
-        <FeaturedItemsSection />
+        <CategorySection />
+        {/* <FeaturedItemsSection />
         <HowItWorksSection />
         <WhyCampusGearSection />
         <ProviderStudentSection />*/}
