@@ -1,17 +1,38 @@
-const Page = () => {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1 className="text-4xl font-bold">Welcome to Campus Gear</h1>
-      <p className="mt-4 text-lg text-gray-600">
-        Own the weekend, not the gear.
-      </p>
-      <div className="mt-8">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          Get Started
-        </button>
-      </div>
-    </div>
-  );
-};
+import { CategorySection } from "@/components/landing/category-section";
+import { CommunitySection } from "@/components/landing/community-section";
+import { CTASection } from "@/components/landing/cta-section";
+import { FeaturedItemsSection } from "@/components/landing/featured-items-section";
+import { Footer } from "@/components/landing/footer";
+import { Header } from "@/components/landing/header";
+import { HeroSection } from "@/components/landing/hero-section";
+import { HowItWorksSection } from "@/components/landing/how-it-works-section";
+import { ProviderStudentSection } from "@/components/landing/provider-student-section";
+import { WhyCampusGearSection } from "@/components/landing/why-campus-gear-section";
 
-export default Page;
+export default function Page() {
+  return (
+    <>
+      <a
+        href="#main-content"
+        className="skip-link sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-100 focus-visible:bg-ink focus-visible:px-5 focus-visible:py-3 focus-visible:font-mono focus-visible:text-xs focus-visible:font-bold focus-visible:uppercase focus-visible:tracking-[0.16em] focus-visible:text-paper"
+      >
+        Skip to content
+      </a>
+
+      <Header />
+
+      <main id="main-content" tabIndex={-1}>
+        <HeroSection />
+        <CategorySection />
+        <FeaturedItemsSection />
+        <HowItWorksSection />
+        <WhyCampusGearSection />
+        <ProviderStudentSection />
+        <CommunitySection />
+        <CTASection />
+      </main>
+
+      <Footer />
+    </>
+  );
+}

@@ -26,11 +26,11 @@ const spaceMono = Space_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Campus Gear — Own the weekend, not the gear",
+    default: "Campus Gear — Rent what you need, right on campus",
     template: "%s | Campus Gear",
   },
   description:
-    "Request sports and outdoor gear by the day. Providers confirm availability, then Stripe handles payment securely.",
+    "The campus marketplace for renting the things you need. Find laptops, calculators, cricket bats and more from students nearby — or list your own gear and earn from it.",
   applicationName: "Campus Gear",
   icons: {
     icon: "/campus-gear-mark.svg",

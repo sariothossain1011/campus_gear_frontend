@@ -339,6 +339,9 @@ a {
   --pine: var(--brand-pine);
   --mist: #dce6dd;
   --line: #c8d1c8;
+  --gear-sage: #d7e5dd;
+  --gear-sun: #f0c957;
+  --gear-sky: #c9d4ff;
   --signal: #ad330e;
   --background: var(--ink);
   --foreground: var(--paper);
@@ -366,6 +369,9 @@ a {
   --pine: var(--brand-pine);
   --mist: #dce6dd;
   --line: #c8d1c8;
+  --gear-sage: #d7e5dd;
+  --gear-sun: #f0c957;
+  --gear-sky: #c9d4ff;
   --signal: #ad330e;
   --background: var(--orange);
   --foreground: var(--ink);
@@ -385,6 +391,9 @@ a {
   --pine: var(--brand-pine);
   --mist: #dce6dd;
   --line: #c8d1c8;
+  --gear-sage: #d7e5dd;
+  --gear-sun: #f0c957;
+  --gear-sky: #c9d4ff;
   --signal: #ad330e;
 }
 
@@ -401,4 +410,82 @@ a {
   html {
     @apply font-sans;
   }
+}
+/* ---------------------------------------------------------------------------
+   Landing page primitives
+   Extends the existing field-guide language: hard edges, flat colour blocks,
+   depth from borders rather than shadows.
+   --------------------------------------------------------------------------- */
+
+.reveal {
+  opacity: 1;
+}
+
+/* The hidden start state is opt-in: it only applies where JS can actually
+   flip it back on, so a scripting-disabled browser renders the page complete.
+   Reduced-motion users skip the movement entirely. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  .reveal {
+    transition:
+      opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal[data-reveal="pending"] {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+/* Bordered tile that gains an offset "print registration" block on hover.
+   Replaces box-shadow, which this design system never uses. */
+.edge-card {
+  position: relative;
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 260ms ease;
+}
+
+.edge-card::after {
+  position: absolute;
+  inset: 0;
+  border: 1px solid currentColor;
+  content: "";
+  opacity: 0;
+  transform: translate(0, 0);
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease;
+  pointer-events: none;
+}
+
+.edge-card:hover::after,
+.edge-card:focus-within::after {
+  opacity: 0.32;
+  transform: translate(6px, 6px);
+}
+
+.edge-card:hover,
+.edge-card:focus-within {
+  transform: translateY(-3px);
+}
+
+/* Diagonal hatch used behind item illustrations so every tile reads as a
+   deliberate graphic panel rather than a missing photograph. */
+.hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in oklab, currentColor 14%, transparent) 0,
+    color-mix(in oklab, currentColor 14%, transparent) 1px,
+    transparent 1px,
+    transparent 9px
+  );
+}
+
+.dot-field {
+  background-image: radial-gradient(
+    color-mix(in oklab, currentColor 26%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 14px 14px;
 }
