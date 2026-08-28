@@ -1,3 +1,4 @@
+import { CommunitySection } from "@/components/landing/community-section";
 import { CTASection } from "@/components/landing/cta-section";
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
@@ -21,8 +22,8 @@ export default function Page() {
         <FeaturedItemsSection />
         <HowItWorksSection />
         <WhyCampusGearSection />
-        <ProviderStudentSection />
-        <CommunitySection />*/}
+        <ProviderStudentSection />*/}
+        <CommunitySection />
         <CTASection />
       </main>
 
