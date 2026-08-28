@@ -5,6 +5,9 @@ import { FeaturedItemsSection } from "@/components/landing/featured-items-sectio
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
 import { HeroSection } from "@/components/landing/hero-section";
+import { HowItWorksSection } from "@/components/landing/how-it-works-section";
+import { ProviderStudentSection } from "@/components/landing/provider-student-section";
+import { WhyCampusGearSection } from "@/components/landing/why-campus-gear-section";
 
 export default function Page() {
   return (
@@ -22,9 +25,9 @@ export default function Page() {
         <HeroSection />
         <CategorySection />
         <FeaturedItemsSection />
-        {/*<HowItWorksSection />
-        <WhyCampusGearSection />
-        <ProviderStudentSection />*/}
+      <HowItWorksSection/>
+        <WhyCampusGearSection/>
+        <ProviderStudentSection/>
         <CommunitySection />
         <CTASection />
       </main>
