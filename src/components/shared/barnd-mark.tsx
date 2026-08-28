@@ -12,7 +12,7 @@ export function BrandMark({
   return (
     <Link
       href="/"
-      aria-label="GearUp home"
+      aria-label="Campus Gear home"
       className="group inline-flex min-h-11 items-center gap-2.5 rounded-sm"
     >
       <span
@@ -24,9 +24,9 @@ export function BrandMark({
       <span
         className={`font-display text-[1.7rem] font-black tracking-[-0.035em] ${inverse ? "text-paper" : "text-ink"}`}
       >
-        GEAR
+        CAMPUS
         <span className={inverse ? "text-orange" : "text-signal"}>/</span>
-        UP
+        GEAR
       </span>
       {!compact && (
         <span

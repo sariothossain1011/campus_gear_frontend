@@ -26,14 +26,14 @@ const spaceMono = Space_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "GearUp — Own the weekend, not the gear",
-    template: "%s | GearUp",
+    default: "Campus Gear — Own the weekend, not the gear",
+    template: "%s | Campus Gear",
   },
   description:
     "Request sports and outdoor gear by the day. Providers confirm availability, then Stripe handles payment securely.",
-  applicationName: "GearUp",
+  applicationName: "Campus Gear",
   icons: {
-    icon: "/gearup-mark.svg",
+    icon: "/campus-gear-mark.svg",
   },
 };
 
@@ -62,7 +62,7 @@ export default function RootLayout({
           defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
-          storageKey="gearup-theme"
+          storageKey="campus-gear-theme"
         >
           {children}
           <Toaster
