@@ -1,6 +1,7 @@
 import { CategorySection } from "@/components/landing/category-section";
 import { CommunitySection } from "@/components/landing/community-section";
 import { CTASection } from "@/components/landing/cta-section";
+import { FeaturedItemsSection } from "@/components/landing/featured-items-section";
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
 import { HeroSection } from "@/components/landing/hero-section";
@@ -20,8 +21,8 @@ export default function Page() {
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
         <CategorySection />
-        {/* <FeaturedItemsSection />
-        <HowItWorksSection />
+        <FeaturedItemsSection />
+        {/*<HowItWorksSection />
         <WhyCampusGearSection />
         <ProviderStudentSection />*/}
         <CommunitySection />
