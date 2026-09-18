@@ -4,7 +4,11 @@ import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { StepCard } from "../ui/step-card";
-import { providerSteps, studentSteps } from "@/lib/landing-data";
+import {
+  providerSteps,
+  studentSteps,
+  LIST_ITEM_HREF,
+} from "@/lib/landing-data";
 
 const tracks = [
   {
@@ -23,7 +27,7 @@ const tracks = [
     steps: providerSteps,
     variant: "provider" as const,
     accent: "text-orange",
-    cta: { label: "List Your Item", href: "/list-your-item" },
+    cta: { label: "List Your Item", href: LIST_ITEM_HREF },
   },
 ];
 
@@ -34,7 +38,10 @@ export function HowItWorksSection() {
       aria-labelledby="how-it-works-heading"
       className="surface-inverse relative scroll-mt-24 overflow-hidden bg-background py-20 text-foreground sm:py-28"
     >
-      <div aria-hidden="true" className="route-grid absolute inset-0 opacity-25" />
+      <div
+        aria-hidden="true"
+        className="route-grid absolute inset-0 opacity-25"
+      />
 
       <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-8">
         <Reveal>
@@ -43,7 +50,9 @@ export function HowItWorksSection() {
             tone="inverse"
             kicker="How it works"
             title={
-              <span id="how-it-works-heading">A marketplace with two sides</span>
+              <span id="how-it-works-heading">
+                A marketplace with two sides
+              </span>
             }
             lead="One community, two directions. Students find what they need; providers earn from what they already own."
           />
@@ -67,13 +76,19 @@ export function HowItWorksSection() {
 
               <ol className="mt-9 flex flex-col gap-7">
                 {track.steps.map((step) => (
-                  <StepCard key={step.title} item={step} variant={track.variant} />
+                  <StepCard
+                    key={step.title}
+                    item={step}
+                    variant={track.variant}
+                  />
                 ))}
               </ol>
 
               <Button
                 asChild
-                variant={track.variant === "provider" ? "outline-accent" : "primary"}
+                variant={
+                  track.variant === "provider" ? "outline-accent" : "primary"
+                }
                 size="lg"
                 className="mt-10 self-start"
               >

@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/shared/reveal";
+import { LIST_ITEM_HREF } from "@/lib/landing-data";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -39,7 +40,7 @@ export function CTASection() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="xl">
-            <Link href="/list-your-item">Start Listing</Link>
+            <Link href={LIST_ITEM_HREF}>Start Listing</Link>
           </Button>
         </div>
       </Reveal>

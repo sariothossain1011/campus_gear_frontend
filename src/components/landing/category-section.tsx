@@ -2,11 +2,17 @@ import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
 import { CategoryCard } from "@/components/ui/category-card";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { categories } from "@/lib/landing-data";
+import { getCategoryTiles } from "@/lib/landing-content";
+import { LIST_ITEM_HREF } from "@/lib/landing-data";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-export function CategorySection() {
+import { LandingNotice } from "./landing-notice";
+
+export async function CategorySection() {
+  const result = await getCategoryTiles();
+  const tiles = result.ok ? result.data.tiles : [];
+
   return (
     <section
       id="categories"
@@ -22,7 +28,11 @@ export function CategorySection() {
                 Everything you need, just around you
               </span>
             }
-            lead="Six shelves of campus gear, listed by students a short walk away."
+            lead={
+              result.ok && result.data.totalCategories > 0
+                ? `${result.data.totalCategories} shelves of gear, listed by people a short walk away. These are the best stocked right now.`
+                : "Shelves of gear, listed by people a short walk away."
+            }
           />
           <Button
             asChild
@@ -37,18 +47,30 @@ export function CategorySection() {
           </Button>
         </Reveal>
 
-        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category, index) => (
-            <Reveal
-              as="li"
-              key={category.name}
-              delay={index * 70}
-              className="h-full"
-            >
-              <CategoryCard category={category} />
-            </Reveal>
-          ))}
-        </ul>
+        {!result.ok ? (
+          <LandingNotice
+            message={`Categories couldn't be loaded right now. ${result.message}`}
+          />
+        ) : tiles.length === 0 ? (
+          <LandingNotice
+            message="No categories have listings yet. Be the first to list something."
+            href={LIST_ITEM_HREF}
+            action="List your item"
+          />
+        ) : (
+          <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {tiles.map((category, index) => (
+              <Reveal
+                as="li"
+                key={category.href}
+                delay={index * 70}
+                className="h-full"
+              >
+                <CategoryCard category={category} />
+              </Reveal>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );

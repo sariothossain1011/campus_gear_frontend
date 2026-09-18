@@ -1,19 +1,18 @@
-import {
-  ArrowUpRight,
-  Backpack,
-  Bike,
-  Dumbbell,
-  PackageOpen,
-  TentTree,
-  Waves,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { createElement } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { GearItem } from "@/lib/validations/types";
-import { getTrustedGearImageUrl } from "../../_utils/gear-image";
+import {
+  formatGearPrice,
+  gearIconFor,
+  getTrustedGearImageUrl,
+} from "@/lib/gear-display";
+
+export { formatGearPrice };
 
 const cardThemes = [
   "bg-orange text-ink",
@@ -31,51 +30,16 @@ export function GearIcon({
   gear: Pick<GearItem, "name" | "category">;
   className?: string;
 }) {
-  const descriptor = `${gear.category.name} ${gear.name}`.toLowerCase();
-  const iconProps = {
+  // `gearIconFor` returns one of a fixed set of module-level icons, so this
+  // renders an existing component rather than defining one per render.
+  return createElement(gearIconFor(`${gear.category.name} ${gear.name}`), {
     "aria-hidden": true,
     strokeWidth: 1.25,
     className: cn(
       "relative size-28 transition-transform duration-500 group-hover/card:rotate-[-4deg] group-hover/card:scale-105",
       className,
     ),
-  } as const;
-
-  if (descriptor.includes("cycl") || descriptor.includes("bike")) {
-    return <Bike {...iconProps} />;
-  }
-  if (descriptor.includes("camp") || descriptor.includes("tent")) {
-    return <TentTree {...iconProps} />;
-  }
-  if (descriptor.includes("hik") || descriptor.includes("trek")) {
-    return <Backpack {...iconProps} />;
-  }
-  if (descriptor.includes("water") || descriptor.includes("kayak")) {
-    return <Waves {...iconProps} />;
-  }
-  if (descriptor.includes("sport") || descriptor.includes("fitness")) {
-    return <Dumbbell {...iconProps} />;
-  }
-
-  return <PackageOpen {...iconProps} />;
-}
-
-export function formatGearPrice(price: string | number) {
-  const numericPrice = Number(price);
-  const configuredCurrency = process.env.CAMPUS_GEAR_CURRENCY?.trim().toUpperCase();
-  const currency = configuredCurrency?.match(/^[A-Z]{3}$/)
-    ? configuredCurrency
-    : "USD";
-
-  if (!Number.isFinite(numericPrice)) {
-    return "Price on request";
-  }
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: numericPrice % 1 === 0 ? 0 : 2,
-  }).format(numericPrice);
+  });
 }
 
 type GearCardProps = {

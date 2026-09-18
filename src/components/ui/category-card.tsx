@@ -1,4 +1,4 @@
-import { toneStyles, type Category } from "@/lib/landing-data";
+import { toneStyles, type CategoryTile } from "@/lib/landing-data";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
@@ -6,7 +6,7 @@ import Link from "next/link";
  * Category tile. The whole card is one link target — the arrow is decorative,
  * so there is a single tab stop and a single accessible name per card.
  */
-export function CategoryCard({ category }: { category: Category }) {
+export function CategoryCard({ category }: { category: CategoryTile }) {
   const { icon: Icon, name, description, itemCount, tone, href } = category;
 
   return (
@@ -33,7 +33,7 @@ export function CategoryCard({ category }: { category: Category }) {
       <p className="mt-3 text-sm leading-6 text-foreground/65">{description}</p>
 
       <p className="mt-auto pt-6 font-mono text-[0.65rem] font-bold uppercase tracking-[0.18em] text-foreground/50">
-        {itemCount} listings
+        {itemCount} {itemCount === 1 ? "listing" : "listings"}
       </p>
     </Link>
   );

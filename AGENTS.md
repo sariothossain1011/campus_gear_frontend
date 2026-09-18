@@ -48,7 +48,7 @@ Before wiring any feature to data:
 - **Errors:** always branch on `result.ok`. Show `error.message` (already user-safe), and never throw raw backend errors into the UI.
 - **Roles:** `CUSTOMER` rents, `PROVIDER` lists gear and fulfils orders, `ADMIN` manages everything. Gate UI by the role from `GET /auth/me`, but treat the backend's 401/403 as the real authority.
 - **Payments:** only the Stripe webhook sets `PAID`. The frontend redirects to `checkoutUrl` and must provide `/payment/success` and `/payment/cancel` pages.
-- **Mock data:** `src/lib/landing-data.ts` is placeholder content. When a section gets wired to the API, keep only presentation data (icons, tones, copy) there and fetch the rest.
+- **Landing page data:** the hero stats and tiles, categories, featured listings and latest review are live. They come from `src/lib/landing-content.ts`, and each section shows a notice (never placeholder gear) when data is missing. `src/lib/landing-data.ts` holds only static copy, view-model types and palette. Listing display helpers (price, icon, trusted image hosts) live in `src/lib/gear-display.ts` and are shared with the catalog.
 
 # Reference frontend (`frontend/`)
 

@@ -1,26 +1,16 @@
-import { CricketBatGlyph } from "@/components/shared/gear-glyphs";
 import {
   BadgeCheck,
   Boxes,
-  Calculator,
-  Camera,
   Coins,
   Compass,
-  Gamepad2,
   HandCoins,
   Handshake,
-  Headphones,
-  Laptop,
-  MapPin,
-  MessageSquare,
   Search,
   Send,
   SlidersHorizontal,
   Sparkles,
   Star,
-  Tent,
   UserRound,
-  Volleyball,
   Wallet,
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -35,9 +25,9 @@ export type GearIcon = ComponentType<{
 }>;
 
 /**
- * Static marketing content for the landing page. Kept in one module so every
- * section renders from a typed array instead of duplicating markup, and so the
- * copy can be swapped for real API data later without touching layout code.
+ * Landing page content: the static marketing copy, plus the shapes and
+ * palette the API-driven sections (hero, categories, featured, community)
+ * render into. Live data comes from `src/lib/landing-content.ts`.
  */
 
 /** Palette slots reused across tiles so illustrations stay on-brand. */
@@ -80,7 +70,8 @@ export const toneStyles: Record<GearTone, { panel: string; badge: string }> = {
   },
 };
 
-export type Category = {
+/** Category tile, built from `GET /categories` plus a per-category listing count. */
+export type CategoryTile = {
   name: string;
   description: string;
   itemCount: number;
@@ -89,170 +80,38 @@ export type Category = {
   href: string;
 };
 
-// Placeholder tiles: these names don't exist in the backend yet, so each one
-// opens the full catalog rather than an empty filtered result. Once the section
-// renders `GET /categories`, link to `/gear?category=<id>` instead.
-export const categories: Category[] = [
-  {
-    name: "Electronics",
-    description: "Laptops, headphones, projectors, power banks & more",
-    itemCount: 128,
-    icon: Laptop,
-    tone: "sky",
-    href: "/gear",
-  },
-  {
-    name: "Study & Academic",
-    description: "Calculators, reference books, lab kits & drafting tools",
-    itemCount: 94,
-    icon: Calculator,
-    tone: "sage",
-    href: "/gear",
-  },
-  {
-    name: "Sports",
-    description: "Cricket bats, footballs, tennis rackets & more",
-    itemCount: 76,
-    icon: Volleyball,
-    tone: "lime",
-    href: "/gear",
-  },
-  {
-    name: "Entertainment",
-    description: "Carrom boards, board games, controllers & speakers",
-    itemCount: 41,
-    icon: Gamepad2,
-    tone: "sun",
-    href: "/gear",
-  },
-  {
-    name: "Photography",
-    description: "DSLRs, tripods, gimbals & lighting for club shoots",
-    itemCount: 33,
-    icon: Camera,
-    tone: "orange",
-    href: "/gear",
-  },
-  {
-    name: "Campus Essentials",
-    description: "Trolley bags, tents, ironing boards & dorm extras",
-    itemCount: 58,
-    icon: Tent,
-    tone: "mist",
-    href: "/gear",
-  },
-];
-
+/** Listing card, built from a `GET /gear` row. */
 export type RentalItem = {
   name: string;
   category: string;
-  pricePerDay: number;
-  /** Shown next to the price, e.g. "day" renders as "৳500 / day". */
-  period: string;
-  rating: number;
-  reviewCount: number;
-  campus: string;
+  /** Already formatted in the configured currency, e.g. "$12". */
+  price: string;
+  providerName: string;
   available: boolean;
-  /** Free-text availability note, e.g. next free date when booked out. */
+  /** Short stock note, e.g. "3 in stock". */
   availabilityNote: string;
+  /** Trusted image URL, or null to fall back to the drawn icon panel. */
+  imageUrl: string | null;
   icon: GearIcon;
   tone: GearTone;
   href: string;
 };
 
-/** Bengali taka, formatted the way listings read on campus: ৳500 / day. */
-export function formatTaka(amount: number): string {
-  return `৳${amount.toLocaleString("en-BD")}`;
-}
-
-// Placeholder listings with no backend id; they open the catalog until this
-// section renders real `GET /gear` results linking to `/gear/<id>`.
-export const featuredItems: RentalItem[] = [
-  {
-    name: "MacBook Air M1",
-    category: "Electronics",
-    pricePerDay: 500,
-    period: "day",
-    rating: 4.9,
-    reviewCount: 32,
-    campus: "Southeast University",
-    available: true,
-    availabilityNote: "Available today",
-    icon: Laptop,
-    tone: "sky",
-    href: "/gear",
-  },
-  {
-    name: "Cricket Bat — English Willow",
-    category: "Sports",
-    pricePerDay: 100,
-    period: "day",
-    rating: 4.8,
-    reviewCount: 47,
-    campus: "Southeast University",
-    available: true,
-    availabilityNote: "Available today",
-    icon: CricketBatGlyph,
-    tone: "lime",
-    href: "/gear",
-  },
-  {
-    name: "Scientific Calculator",
-    category: "Study & Academic",
-    pricePerDay: 40,
-    period: "day",
-    rating: 4.9,
-    reviewCount: 61,
-    campus: "Southeast University",
-    available: true,
-    availabilityNote: "Available today",
-    icon: Calculator,
-    tone: "sage",
-    href: "/gear",
-  },
-  {
-    name: "Canon EOS 200D DSLR",
-    category: "Photography",
-    pricePerDay: 750,
-    period: "day",
-    rating: 4.7,
-    reviewCount: 18,
-    campus: "North South University",
-    available: false,
-    availabilityNote: "Next free Thu",
-    icon: Camera,
-    tone: "orange",
-    href: "/gear",
-  },
-  {
-    name: "Sony WH-1000XM4",
-    category: "Electronics",
-    pricePerDay: 220,
-    period: "day",
-    rating: 4.8,
-    reviewCount: 26,
-    campus: "BRAC University",
-    available: true,
-    availabilityNote: "Available today",
-    icon: Headphones,
-    tone: "mist",
-    href: "/gear",
-  },
-  {
-    name: "Carrom Board (Full Size)",
-    category: "Entertainment",
-    pricePerDay: 150,
-    period: "day",
-    rating: 4.6,
-    reviewCount: 22,
-    campus: "Southeast University",
-    available: true,
-    availabilityNote: "2 left this week",
-    icon: Gamepad2,
-    tone: "sun",
-    href: "/gear",
-  },
+/** Tones cycled across API-driven tiles, so neighbours never share a colour. */
+export const toneCycle: readonly GearTone[] = [
+  "sky",
+  "lime",
+  "sage",
+  "sun",
+  "orange",
+  "mist",
 ];
+
+/**
+ * Where "List your item" goes. Guests sign up and continue to the new-listing
+ * form; a signed-in provider is sent straight there (Proxy honours returnTo).
+ */
+export const LIST_ITEM_HREF = "/signup?returnTo=%2Fdashboard%2Fgear%2Fnew";
 
 export type Step = {
   step: number;
@@ -323,7 +182,8 @@ export const whyCampusGear: Feature[] = [
   },
   {
     title: "Wide Variety",
-    description: "Find everything from academic tools to sports equipment.",
+    description:
+      "From camping kit and bikes to boards, paddles and fitness gear.",
     icon: Boxes,
   },
   {
@@ -341,28 +201,28 @@ export const whyCampusGear: Feature[] = [
 
 export const communityPillars: Feature[] = [
   {
-    title: "Campus-based listings",
+    title: "Owner-confirmed requests",
     description:
-      "Every listing is tied to a campus, so browsing starts with the gear closest to you.",
-    icon: MapPin,
-  },
-  {
-    title: "Provider profiles",
-    description:
-      "See who owns the item, what else they list, and how long they have been renting.",
+      "A rental starts as a request. The provider confirms the dates before anyone pays.",
     icon: BadgeCheck,
   },
   {
-    title: "Ratings and reviews",
+    title: "Known providers",
     description:
-      "Renters rate the item and the handover, so the next student knows what to expect.",
+      "Every listing shows who owns it, so you know who you're meeting for the handover.",
+    icon: UserRound,
+  },
+  {
+    title: "Reviews from real rentals",
+    description:
+      "Only a renter who returned the item can review it, so every rating comes from a real handover.",
     icon: Star,
   },
   {
-    title: "Direct messaging",
+    title: "Secure Stripe checkout",
     description:
-      "Agree on pickup time and place with the provider before you confirm a request.",
-    icon: MessageSquare,
+      "Payment happens on Stripe once the rental is confirmed. Campus Gear never sees your card.",
+    icon: Wallet,
   },
 ];
 
@@ -378,7 +238,7 @@ export const footerColumns: FooterColumn[] = [
       { label: "Browse Items", href: "/gear" },
       { label: "Categories", href: "/#categories" },
       { label: "How It Works", href: "/#how-it-works" },
-      { label: "Become a Provider", href: "/list-your-item" },
+      { label: "Become a Provider", href: LIST_ITEM_HREF },
     ],
   },
   {
@@ -403,5 +263,5 @@ export const primaryNav = [
   { label: "Browse Items", href: "/gear" },
   { label: "Categories", href: "/#categories" },
   { label: "How It Works", href: "/#how-it-works" },
-  { label: "Become a Provider", href: "/list-your-item" },
+  { label: "Become a Provider", href: LIST_ITEM_HREF },
 ];

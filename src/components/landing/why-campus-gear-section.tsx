@@ -40,7 +40,7 @@ export function WhyCampusGearSection() {
                   {lead.description}
                 </p>
                 <p className="mt-8 border-t border-paper/20 pt-5 font-mono text-[0.62rem] font-bold uppercase tracking-[0.18em] text-lime">
-                  A ৳40 calculator beats a ৳2,400 one
+                  A weekend rental beats a year in storage
                 </p>
               </div>
             </article>

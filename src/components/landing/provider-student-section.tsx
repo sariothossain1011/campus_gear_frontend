@@ -1,4 +1,5 @@
 import { ArrowRight, HandCoins, Search } from "lucide-react";
+import { LIST_ITEM_HREF } from "@/lib/landing-data";
 import Link from "next/link";
 import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ const sides = [
     title: "Have something useful?",
     description:
       "Your unused gear could be exactly what another student is looking for. List it on Campus Gear and earn from it.",
-    cta: { label: "List Your Item", href: "/list-your-item" },
+    cta: { label: "List Your Item", href: LIST_ITEM_HREF },
     surface: "surface-inverse bg-pine text-paper",
     // Orange on pine lands at ~4:1, under the 4.5:1 floor for text this small;
     // gear-sun keeps the warm provider association and clears it comfortably.

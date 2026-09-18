@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { GearDetail as GearDetailType } from "@/lib/validations/types";
-import { getTrustedGearImageUrl } from "../../_utils/gear-image";
+import { getTrustedGearImageUrl } from "@/lib/gear-display";
 import { Reveal } from "@/components/shared/reveal";
 import { formatGearPrice, GearIcon } from "./gear-card";
 import { RentalRequestCard } from "./rental-request-card";
