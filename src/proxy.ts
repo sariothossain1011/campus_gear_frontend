@@ -4,6 +4,7 @@ import {
   AUTH_PAGES,
   DEFAULT_HOME,
   ROLE_HOME,
+  allowedRolesForPath,
   isProtectedPath,
   safeReturnTo,
 } from "@/lib/auth/routes";
@@ -41,6 +42,22 @@ export function proxy(request: NextRequest) {
       const returnTo = safeReturnTo(`${pathname}${search}`);
       if (returnTo) loginUrl.searchParams.set("returnTo", returnTo);
       return NextResponse.redirect(loginUrl);
+    }
+
+    // Obviously wrong role (per the unverified token): send them to their own
+    // dashboard instead of rendering a page the guard would reject anyway.
+    const role = (hasAccess ? access : refresh)?.role;
+
+    // `/dashboard` itself is only a doorway to the role's own overview. Its
+    // page redirects too, but that happens mid-stream; doing it here is a
+    // plain 307.
+    if (role && pathname === DEFAULT_HOME) {
+      return NextResponse.redirect(new URL(ROLE_HOME[role], request.url));
+    }
+
+    const allowedRoles = allowedRolesForPath(pathname);
+    if (role && allowedRoles && !allowedRoles.includes(role)) {
+      return NextResponse.redirect(new URL(ROLE_HOME[role], request.url));
     }
 
     return NextResponse.next();

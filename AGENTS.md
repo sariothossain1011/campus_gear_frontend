@@ -34,7 +34,11 @@ Before wiring any feature to data:
   - `src/lib/auth/routes.ts` has `safeReturnTo`, `ROLE_HOME` and the protected prefixes.
   - `src/proxy.ts` does optimistic redirects only; `src/app/auth/refresh/route.ts` renews tokens.
   - Protected API calls pass `auth: true`.
-  - Every new private page or layout must call `requireUser`/`requireRole`. To protect a new top-level area, add its prefix to `PROTECTED_PREFIXES` and to the `matcher` in `src/proxy.ts`.
+  - Every new private page or layout must call `requireUser`/`requireRole`.
+- **Dashboards:** each role lands on its own overview: `/dashboard/customer`, `/dashboard/provider`, `/dashboard/admin` (`ROLE_HOME`). They share the shell in `src/app/dashboard/_components/`.
+  - Add sidebar links in `src/app/dashboard/_config/navigation.ts`, and only for pages that exist.
+  - Restrict a new role-only area with `ROLE_RESTRICTED_PREFIXES` in `src/lib/auth/routes.ts` plus `requireRole` on the page.
+  - Counts come from `meta.total` of `limit: 1` list calls (`_utils/results.ts`). There is no stats endpoint. To protect a new top-level area, add its prefix to `PROTECTED_PREFIXES` and to the `matcher` in `src/proxy.ts`.
 - **Types:** put API response types in `src/lib/validations/types.ts`, mirroring the backend exactly. Decimal fields (`pricePerDay`, `totalPrice`, `amount`, `rating`) arrive as strings: type them `DecimalValue` and convert with `Number()`. Dates are ISO strings; date inputs are `YYYY-MM-DD`; IDs are UUIDs.
 - **Forms:** frontend Zod schemas in `src/lib/` must be at least as strict as the backend validation. Map form fields to backend field names when sending. Map `error.fieldErrors` (keyed by backend field name) back onto form fields with `setError`, and show everything else on `root`.
 - **Caching:** use `cache: "no-store"` for user-specific or auth'd data and for all mutations. Public catalogue reads (categories, gear lists) may use `next: { revalidate, tags }`. Never combine `no-store` with `revalidate`, because `gearUpFetch` rejects it. After a mutation, `revalidateTag`/`revalidatePath` the affected data.

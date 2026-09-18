@@ -6,22 +6,41 @@ export const AUTH_PAGES = ["/login", "/signup"] as const;
 /** Everything under these prefixes requires a session. */
 export const PROTECTED_PREFIXES = ["/dashboard"] as const;
 
-/**
- * Where each role lands after signing in. One shared dashboard for now; point
- * a role at its own overview here once it exists.
- */
+/** Where each role lands after signing in, and where wrong-role visits go. */
 export const ROLE_HOME: Record<Role, string> = {
-  CUSTOMER: "/dashboard",
-  PROVIDER: "/dashboard",
-  ADMIN: "/dashboard",
+  CUSTOMER: "/dashboard/customer",
+  PROVIDER: "/dashboard/provider",
+  ADMIN: "/dashboard/admin",
 };
 
+/** Resolves to the role's own home; see `src/app/dashboard/page.tsx`. */
 export const DEFAULT_HOME = "/dashboard";
 
-export function isProtectedPath(pathname: string) {
-  return PROTECTED_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+/**
+ * Dashboard areas only some roles may open. Paths not listed here (e.g. the
+ * shared `/dashboard/account`) are open to every signed-in role. Proxy uses
+ * this for a quick bounce; `requireRole` on each page is the real check.
+ */
+const ROLE_RESTRICTED_PREFIXES: readonly { prefix: string; roles: readonly Role[] }[] = [
+  { prefix: "/dashboard/customer", roles: ["CUSTOMER"] },
+  { prefix: "/dashboard/provider", roles: ["PROVIDER"] },
+  { prefix: "/dashboard/admin", roles: ["ADMIN"] },
+];
+
+function matchesPrefix(pathname: string, prefix: string) {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
+/** Roles allowed on a dashboard path, or null when any signed-in role may view it. */
+export function allowedRolesForPath(pathname: string): readonly Role[] | null {
+  return (
+    ROLE_RESTRICTED_PREFIXES.find(({ prefix }) => matchesPrefix(pathname, prefix))
+      ?.roles ?? null
   );
+}
+
+export function isProtectedPath(pathname: string) {
+  return PROTECTED_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix));
 }
 
 /**

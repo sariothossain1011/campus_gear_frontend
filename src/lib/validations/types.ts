@@ -90,3 +90,80 @@ export type ApiProblem = {
   fieldErrors?: FieldErrors;
   retryable: boolean;
 };
+
+export type RentalOrderStatus =
+  | "PLACED"
+  | "CONFIRMED"
+  | "PAID"
+  | "PICKED_UP"
+  | "RETURNED"
+  | "CANCELLED";
+
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED";
+
+export type Category = {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type GearItem = {
+  id: string;
+  categoryId: string;
+  providerId: string;
+  name: string;
+  description: string;
+  stock: number;
+  isAvailable: boolean;
+  pricePerDay: DecimalValue;
+  imageUrl: string | null;
+  imageUrls: string[];
+  brand: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** `GET /gear` list rows. */
+export type GearListItem = GearItem & {
+  category: Category;
+  provider: { id: string; name: string };
+};
+
+export type Payment = {
+  id: string;
+  rentalOrderId: string;
+  amount: DecimalValue;
+  stripePaymentIntentId: string | null;
+  stripeSessionId: string | null;
+  status: PaymentStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** `GET /orders` and `GET /orders/:id` — scoped to the caller's role. */
+export type OrderDetail = {
+  id: string;
+  gearItemId: string;
+  customerId: string;
+  startDate: string;
+  endDate: string;
+  totalPrice: DecimalValue;
+  quantity: number;
+  status: RentalOrderStatus;
+  createdAt: string;
+  updatedAt: string;
+  gearItem: GearItem & {
+    category: Category;
+    provider: { id: string; name: string; email: string };
+  };
+  customer: { id: string; name: string; email: string; phone: string };
+  payment: Payment | null;
+};
+
+/** `GET /users` rows (admin only). */
+export type AdminUser = CurrentUser & {
+  _count: { gearItems: number; rentalOrders: number; reviews: number };
+};
+
+export type PageQuery = { page?: number; limit?: number };
