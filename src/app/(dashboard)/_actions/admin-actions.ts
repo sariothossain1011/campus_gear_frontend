@@ -59,6 +59,37 @@ function apiState(result: { ok: false; error: { message: string; fieldErrors?: F
   return errorState(result.error.message, result.error.fieldErrors);
 }
 
+/**
+ * Field errors for a failed user write. The backend reports a duplicate email
+ * or phone as a 409 with only a message, so pin it to the field it names.
+ */
+function userFieldErrors(error: {
+  status: number | null;
+  message: string;
+  fieldErrors?: FieldErrors;
+}): FieldErrors | undefined {
+  if (error.fieldErrors) return error.fieldErrors;
+  if (error.status !== 409) return undefined;
+  if (/email/i.test(error.message)) return { email: [error.message] };
+  if (/phone/i.test(error.message)) return { phone: [error.message] };
+  return undefined;
+}
+
+/**
+ * A duplicate category name reaches us as the backend's raw Prisma message
+ * ("Duplicate Key Error"); say what actually happened, on the name field.
+ */
+function categoryErrorState(
+  error: { status: number | null; message: string; fieldErrors?: FieldErrors },
+  name: string,
+) {
+  if (error.status === 400 && /duplicate key/i.test(error.message)) {
+    const message = `A category named "${name}" already exists.`;
+    return errorState(message, { name: [message] }, { name });
+  }
+  return errorState(error.message, error.fieldErrors, { name });
+}
+
 function successState(message: string): AdminMutationState {
   return { status: "success", message };
 }
@@ -139,7 +170,7 @@ export async function updateUserAction(
   // rentals. Each reaches the form as a field or page-level message.
   const result = await updateUser(userId, parsed.data);
   if (!result.ok) {
-    return errorState(result.error.message, result.error.fieldErrors, input);
+    return errorState(result.error.message, userFieldErrors(result.error), input);
   }
 
   invalidateAdmin([
@@ -175,7 +206,7 @@ export async function createAdminAction(
 
   const result = await createAdmin(parsed.data);
   if (!result.ok) {
-    return errorState(result.error.message, result.error.fieldErrors, values);
+    return errorState(result.error.message, userFieldErrors(result.error), values);
   }
 
   invalidateAdmin(["/dashboard/admin", "/dashboard/users"]);
@@ -199,7 +230,7 @@ export async function createCategoryAction(
   }
 
   const result = await createCategory(parsed.data.name);
-  if (!result.ok) return errorState(result.error.message, result.error.fieldErrors, { name });
+  if (!result.ok) return categoryErrorState(result.error, parsed.data.name);
 
   invalidateAdmin(["/dashboard/categories"], ["categories"]);
   return successState(result.message);
@@ -225,13 +256,14 @@ export async function updateCategoryAction(
   }
 
   const result = await updateCategory(categoryId, parsed.data.name);
-  if (!result.ok) return errorState(result.error.message, result.error.fieldErrors, { name });
+  if (!result.ok) return categoryErrorState(result.error, parsed.data.name);
 
   invalidateAdmin(["/dashboard/categories", "/dashboard/gear"], [
     "categories",
     "gear",
   ]);
-  return successState(result.message);
+  // The backend's own wording here is "Successfully update category".
+  return successState(`Category renamed to "${result.data.name}".`);
 }
 
 export async function deleteCategoryAction(
@@ -487,7 +519,27 @@ export async function deleteGearAction(
   if (invalidId) return errorState(invalidId);
 
   const result = await deleteGearItem(gearId);
-  if (!result.ok) return apiState(result);
+  if (!result.ok) {
+    // Orders and reviews reference their gear, so the database refuses to
+    // delete a listing with any rental history; the backend passes that on
+    // as a bare "Foreign key constraint failed".
+    if (result.error.status === 400 && /foreign key/i.test(result.error.message)) {
+      return errorState(
+        "This listing has rental history, so it can't be deleted. Edit it and turn off availability to stop new requests instead.",
+      );
+    }
+    return apiState(result);
+  }
+
+  // The backend only deletes the record; remove its uploaded photos too so
+  // they don't linger in Cloudinary. Best effort: the listing is already
+  // gone, and non-Campus Gear URLs (e.g. seeded images) are skipped.
+  const storedImageUrls = new Set(
+    [result.data.imageUrl, ...(result.data.imageUrls ?? [])].filter(
+      (url): url is string => Boolean(url),
+    ),
+  );
+  await Promise.allSettled([...storedImageUrls].map(removeStoredGearImage));
 
   invalidateAdmin(["/dashboard/admin", "/dashboard/gear"], [
     "gear",
