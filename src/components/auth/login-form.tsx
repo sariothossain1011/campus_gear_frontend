@@ -4,18 +4,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { loginAction } from "@/lib/auth/actions";
 import { loginSchema, type LoginValues } from "@/lib/auth-schemas";
 
+import { applyServerErrors } from "./apply-server-errors";
 import { FormAlert } from "./form-alert";
 
-export function LoginForm() {
+const LOGIN_FIELDS = ["email", "password"] as const;
+
+type LoginFormProps = {
+  /** Already-sanitized path to continue to after signing in. */
+  returnTo: string | null;
+};
+
+export function LoginForm({ returnTo }: LoginFormProps) {
   const {
     register,
     handleSubmit,
@@ -33,16 +41,13 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginValues) => {
     try {
-      // TODO: replace with the real sign-in call. Server-side failures belong
-      // on `root` — they describe the attempt, not any one field.
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      toast.success("Signed in", {
-        description: `Welcome back, ${values.email}.`,
-      });
+      // On success the action sets the session cookies and redirects, so a
+      // returned value always describes a failure.
+      const result = await loginAction(values, returnTo);
+      if (result) applyServerErrors(result, LOGIN_FIELDS, setError);
     } catch {
       setError("root", {
-        message: "We could not sign you in. Check your details and try again.",
+        message: "We could not reach Campus Gear. Check your connection and try again.",
       });
     }
   };

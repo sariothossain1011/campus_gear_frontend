@@ -28,7 +28,13 @@ Before wiring any feature to data:
 - **One client:** every request goes through `gearUpFetch` in `src/services/server-client.ts` (`server-only`). Put one function per endpoint in `src/services/<resource>.ts` (e.g. `src/services/gear.ts`), returning `ApiResult<T>`.
 - **Paths, not URLs:** pass `"/auth/login"`, `"/gear/" + id`, and so on. The base URL comes from `GEARUP_API_URL` (includes `/api`, e.g. `http://localhost:8080/api`) in `.env.local`. `gearUpFetch` rejects absolute URLs, so never hard-code a host.
 - **Where it runs:** read data in Server Components; do mutations in Server Actions (`"use server"`). Client components never call the backend directly and never see tokens. Pass results down as props, or call a Server Action.
-- **Auth:** after login/register, a Server Action stores `data.accessToken` / `data.refreshToken` in httpOnly cookies named `accessToken` / `refreshToken` via `(await cookies()).set(...)`. Protected calls pass `auth: true`. See §6 of the doc for refresh and logout.
+- **Auth (implemented, reuse it):**
+  - `src/lib/auth/actions.ts` has the login, signup and logout Server Actions.
+  - `src/lib/auth/session.ts` handles cookies, `getSessionHint()` for page chrome, and the `requireUser()` / `requireRole()` page guards.
+  - `src/lib/auth/routes.ts` has `safeReturnTo`, `ROLE_HOME` and the protected prefixes.
+  - `src/proxy.ts` does optimistic redirects only; `src/app/auth/refresh/route.ts` renews tokens.
+  - Protected API calls pass `auth: true`.
+  - Every new private page or layout must call `requireUser`/`requireRole`. To protect a new top-level area, add its prefix to `PROTECTED_PREFIXES` and to the `matcher` in `src/proxy.ts`.
 - **Types:** put API response types in `src/lib/validations/types.ts`, mirroring the backend exactly. Decimal fields (`pricePerDay`, `totalPrice`, `amount`, `rating`) arrive as strings: type them `DecimalValue` and convert with `Number()`. Dates are ISO strings; date inputs are `YYYY-MM-DD`; IDs are UUIDs.
 - **Forms:** frontend Zod schemas in `src/lib/` must be at least as strict as the backend validation. Map form fields to backend field names when sending. Map `error.fieldErrors` (keyed by backend field name) back onto form fields with `setError`, and show everything else on `root`.
 - **Caching:** use `cache: "no-store"` for user-specific or auth'd data and for all mutations. Public catalogue reads (categories, gear lists) may use `next: { revalidate, tags }`. Never combine `no-store` with `revalidate`, because `gearUpFetch` rejects it. After a mutation, `revalidateTag`/`revalidatePath` the affected data.

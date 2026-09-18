@@ -8,8 +8,11 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { ProviderStudentSection } from "@/components/landing/provider-student-section";
 import { WhyCampusGearSection } from "@/components/landing/why-campus-gear-section";
+import { getSessionHint } from "@/lib/auth/session";
 
-export default function Page() {
+export default async function Page() {
+  const session = await getSessionHint();
+
   return (
     <>
       <a
@@ -19,7 +22,7 @@ export default function Page() {
         Skip to content
       </a>
 
-      <Header />
+      <Header session={session} />
 
       <main id="main-content" tabIndex={-1}>
         <HeroSection />

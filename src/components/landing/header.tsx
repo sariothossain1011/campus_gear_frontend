@@ -2,12 +2,19 @@
 
 import { BrandMark } from "@/components/shared/barnd-mark";
 import { Button } from "@/components/ui/button";
+import { logoutAction } from "@/lib/auth/actions";
 import { primaryNav } from "@/lib/landing-data";
-import { Menu, X } from "lucide-react";
+import type { SessionHint } from "@/lib/validations/types";
+import { LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export function Header() {
+type HeaderProps = {
+  /** Who the cookies say is signed in, or null for a guest. */
+  session?: SessionHint | null;
+};
+
+export function Header({ session = null }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -55,15 +62,34 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <Link
-            href="/login"
-            className="nav-underline py-1 text-sm font-semibold text-ink/75 transition-colors hover:text-ink"
-          >
-            Login
-          </Link>
-          <Button asChild variant="primary" size="compact">
-            <Link href="/signup">Get Started</Link>
-          </Button>
+          {session ? (
+            <>
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  className="nav-underline inline-flex items-center gap-2 py-1 text-sm font-semibold text-ink/75 transition-colors hover:text-ink"
+                >
+                  <LogOut aria-hidden="true" className="size-4" />
+                  Log out
+                </button>
+              </form>
+              <Button asChild variant="primary" size="compact">
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="nav-underline py-1 text-sm font-semibold text-ink/75 transition-colors hover:text-ink"
+              >
+                Login
+              </Link>
+              <Button asChild variant="primary" size="compact">
+                <Link href="/signup">Get Started</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <Button
@@ -92,7 +118,12 @@ export function Header() {
       >
         <nav aria-label="Mobile" className="px-5 py-5 sm:px-8">
           <ul className="flex flex-col divide-y divide-ink/10">
-            {[...primaryNav, { label: "Login", href: "/login" }].map((link) => (
+            {[
+              ...primaryNav,
+              session
+                ? { label: "Dashboard", href: "/dashboard" }
+                : { label: "Login", href: "/login" },
+            ].map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
@@ -104,11 +135,20 @@ export function Header() {
               </li>
             ))}
           </ul>
-          <Button asChild variant="primary" size="lg" className="mt-6 w-full">
-            <Link href="/signup" onClick={() => setOpen(false)}>
-              Get Started
-            </Link>
-          </Button>
+          {session ? (
+            <form action={logoutAction} className="mt-6">
+              <Button type="submit" variant="outline" size="lg" className="w-full">
+                <LogOut aria-hidden="true" />
+                Log out
+              </Button>
+            </form>
+          ) : (
+            <Button asChild variant="primary" size="lg" className="mt-6 w-full">
+              <Link href="/signup" onClick={() => setOpen(false)}>
+                Get Started
+              </Link>
+            </Button>
+          )}
         </nav>
       </div>
     </header>

@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Separate reference checkouts (git-ignored), not part of this app.
+    "backend/**",
+    "frontend/**",
   ]),
 ]);
 

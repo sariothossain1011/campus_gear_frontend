@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AuthLink, AuthShell } from "@/components/auth/auth-shell";
 import { SignupForm } from "@/components/auth/signup-form";
+import { authPageHref, safeReturnTo } from "@/lib/auth/routes";
 
 export const metadata: Metadata = {
   title: "Create an account",
@@ -9,7 +10,16 @@ export const metadata: Metadata = {
     "Join Campus Gear to rent what you need and list what you already own.",
 };
 
-export default function SignupPage() {
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: string | string[] }>;
+}) {
+  const { returnTo: rawReturnTo } = await searchParams;
+  const returnTo = safeReturnTo(
+    Array.isArray(rawReturnTo) ? rawReturnTo[0] : rawReturnTo,
+  );
+
   return (
     <AuthShell
       kicker="Join the campus"
@@ -29,11 +39,11 @@ export default function SignupPage() {
       formLead="It takes about a minute. No card needed to browse."
       footer={
         <>
-          Already have an account? <AuthLink href="/login">Sign in</AuthLink>
+          Already have an account? <AuthLink href={authPageHref("/login", returnTo)}>Sign in</AuthLink>
         </>
       }
     >
-      <SignupForm />
+      <SignupForm returnTo={returnTo} />
     </AuthShell>
   );
 }

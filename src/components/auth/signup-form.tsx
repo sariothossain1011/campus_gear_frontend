@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "sonner";
 
 import { AccountTypeField } from "@/components/auth/account-type-field";
 import { PasswordInput } from "@/components/auth/password-input";
@@ -13,11 +12,26 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { signupAction } from "@/lib/auth/actions";
 import { signupSchema, type SignupValues } from "@/lib/auth-schemas";
 
+import { applyServerErrors } from "./apply-server-errors";
 import { FormAlert } from "./form-alert";
 
-export function SignupForm() {
+const SIGNUP_FIELDS = [
+  "fullName",
+  "email",
+  "phone",
+  "accountType",
+  "password",
+] as const;
+
+type SignupFormProps = {
+  /** Already-sanitized path to continue to once the account exists. */
+  returnTo: string | null;
+};
+
+export function SignupForm({ returnTo }: SignupFormProps) {
   const {
     register,
     handleSubmit,
@@ -30,6 +44,7 @@ export function SignupForm() {
     defaultValues: {
       fullName: "",
       email: "",
+      phone: "",
       // Left unset so the schema's enum check can require a deliberate choice
       // rather than the form silently defaulting someone into a role.
       accountType: undefined,
@@ -47,17 +62,14 @@ export function SignupForm() {
 
   const onSubmit = async (values: SignupValues) => {
     try {
-      // TODO: replace with the real account-creation call. A duplicate email
-      // comes back from the server, so report it on the field it belongs to:
-      // setError("email", { message: "That email is already registered." })
-      await new Promise((resolve) => setTimeout(resolve, 900));
-
-      toast.success("Account created", {
-        description: `Check ${values.email} for your confirmation link.`,
-      });
+      // On success the action signs the new account in and redirects, so a
+      // returned value always describes a failure — a duplicate email or
+      // phone comes back on the field it belongs to.
+      const result = await signupAction(values, returnTo);
+      if (result) applyServerErrors(result, SIGNUP_FIELDS, setError);
     } catch {
       setError("root", {
-        message: "We could not create your account. Try again in a moment.",
+        message: "We could not reach Campus Gear. Check your connection and try again.",
       });
     }
   };
@@ -93,6 +105,23 @@ export function SignupForm() {
             type="email"
             autoComplete="email"
             placeholder="you@university.edu"
+          />
+        )}
+      </Field>
+
+      <Field
+        label="Phone"
+        error={errors.phone?.message}
+        hint="Used to arrange pickups and returns. One account per number."
+      >
+        {(field) => (
+          <Input
+            {...field}
+            {...register("phone")}
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            placeholder="+880 1700-000000"
           />
         )}
       </Field>

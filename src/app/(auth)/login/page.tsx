@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 
+import { Clock } from "lucide-react";
+
 import { AuthLink, AuthShell } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
+import { authPageHref, safeReturnTo } from "@/lib/auth/routes";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -9,7 +12,20 @@ export const metadata: Metadata = {
     "Sign in to Campus Gear to manage your rentals, listings, and requests.",
 };
 
-export default function LoginPage() {
+type SearchParamValue = string | string[] | undefined;
+
+const first = (value: SearchParamValue) =>
+  Array.isArray(value) ? value[0] : value;
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: SearchParamValue; reason?: SearchParamValue }>;
+}) {
+  const { returnTo: rawReturnTo, reason } = await searchParams;
+  const returnTo = safeReturnTo(first(rawReturnTo));
+  const sessionExpired = first(reason) === "session-expired";
+
   return (
     <AuthShell
       kicker="Welcome back"
@@ -29,11 +45,23 @@ export default function LoginPage() {
       formLead="Enter your details to get back to your rentals."
       footer={
         <>
-          New to Campus Gear? <AuthLink href="/signup">Create an account</AuthLink>
+          New to Campus Gear?{" "}
+          <AuthLink href={authPageHref("/signup", returnTo)}>
+            Create an account
+          </AuthLink>
         </>
       }
     >
-      <LoginForm />
+      {sessionExpired ? (
+        <p
+          role="status"
+          className="mb-6 flex items-start gap-3 border border-ink/15 bg-mist/55 px-4 py-3.5 text-sm leading-6 text-ink/80"
+        >
+          <Clock aria-hidden="true" className="mt-0.5 size-4.5 shrink-0" />
+          Your session ended. Sign in again to pick up where you left off.
+        </p>
+      ) : null}
+      <LoginForm returnTo={returnTo} />
     </AuthShell>
   );
 }
