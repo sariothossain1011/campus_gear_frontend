@@ -1,22 +1,10 @@
 import "server-only";
 
-import type {
-  PageQuery,
-  Payment,
-  PaymentStatus,
-  RentalOrderStatus,
-} from "@/lib/validations/types";
-import { gearUpFetch } from "./server-client";
+import type { Payment, PaymentListQuery } from "@/lib/validations/types";
+import { campusGearFetch } from "./server-client";
 
-export type PaymentListQuery = PageQuery & {
-  search?: string;
-  status?: PaymentStatus;
-  orderStatus?: RentalOrderStatus;
-};
-
-/** Role-scoped by the backend, like orders. */
 export function listPayments(query: PaymentListQuery = {}) {
-  return gearUpFetch<Payment[]>("/payments", {
+  return campusGearFetch<Payment[]>("/payments", {
     auth: true,
     cache: "no-store",
     query: {
@@ -26,6 +14,19 @@ export function listPayments(query: PaymentListQuery = {}) {
       page: query.page ?? 1,
       limit: query.limit ?? 10,
     },
-    fallbackMessage: "Payments couldn't be loaded. Try again shortly.",
+    fallbackMessage:
+      "Payment activity couldn't be loaded. Try again shortly.",
+  });
+}
+
+/**
+ * The backend scopes this by role and returns `404` when the payment exists but
+ * the caller may not see it, so the page treats 403/404 the same way.
+ */
+export function getPayment(id: string) {
+  return campusGearFetch<Payment>(`/payments/${id}`, {
+    auth: true,
+    cache: "no-store",
+    fallbackMessage: "This payment couldn't be loaded. Try again shortly.",
   });
 }

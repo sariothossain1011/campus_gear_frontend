@@ -7,6 +7,10 @@ the catalog with filters, order and review flows, Stripe returns, and Cloudinary
 image uploads. It uses the same design tokens (`--pine`, `--lime`, `--gear-*`,
 `surface-accent`, …) as `src/app/globals.css`.
 
+**Status:** its integration layer, auth guard, dashboard, payment returns and
+public catalog have been ported. See the "Ported" note below. For those areas,
+change the Campus Gear copy in `src/`, not the reference.
+
 Treat it as a **pattern library, not a template**. Before building any feature,
 check whether the reference already solved it, read that code, then write the
 Campus Gear version so it fits this repo.
@@ -59,6 +63,12 @@ lifecycle rules, error mapping, cache policy, a11y bar), `API_INTEGRATION.md`
 | Shadcn primitives not yet here | `src/components/ui/{badge,card,alert,calendar,date-picker,date-range-picker,popover,select,native-select,pagination,sheet,skeleton,slider,textarea,separator}.tsx`. Check the primitive exists first; the reference `components.json` shows the shadcn setup (`style: "radix-nova"`). |
 
 Paths that don't start with `src/` are under `src/app/(dashboard)/`.
+
+## Ported, and how it was adapted
+
+- `src/app/(dashboard)/**`, `src/app/payment/**`, `src/app/(public)/gear/**` (+ `_components/gear`, `_utils`, `validation`), `src/app/service-unavailable`, `src/services/*`, `src/lib/{checkout,image-upload}.ts`, `src/lib/validations/zod-errors.ts`, the auth-session provider, and the shadcn primitives they use.
+- Imports: `@/lib/types` → `@/lib/validations/types`, `brand-mark` → `barnd-mark`, `dashboard-routes` → `@/lib/auth/routes`, logout → `@/lib/auth/actions`.
+- Not ported: the reference landing page and `motion` animations (Campus Gear has its own landing; gear detail uses `@/components/shared/reveal`), `site-header`/`site-footer` (the catalog uses the landing `Header`/`Footer`), and `demo-credentials.ts`.
 
 ## What to take and what to leave
 

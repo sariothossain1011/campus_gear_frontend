@@ -1,28 +1,33 @@
 import "server-only";
 
-import type { GearListItem, PageQuery } from "@/lib/validations/types";
-import { gearUpFetch } from "./server-client";
+import { campusGearFetch } from "./server-client";
+import type {
+  CreateGearInput,
+  GearCatalogQuery,
+  GearDetail,
+  GearItem,
+  GearPriceRange,
+  UpdateGearInput,
+} from "@/lib/validations/types";
 
-export type GearListQuery = PageQuery & {
-  providerId?: string;
-  search?: string;
-  category?: string;
-  brand?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  isAvailable?: boolean;
-  inStock?: boolean;
-  startDate?: string;
-  endDate?: string;
-};
+export function getGearPriceRange() {
+  return campusGearFetch<GearPriceRange>("/gear/price-range", {
+    next: {
+      revalidate: 60,
+      tags: ["gear"],
+    },
+    fallbackMessage: "The catalog price range couldn't be loaded.",
+  });
+}
 
-export function listGear(query: GearListQuery = {}) {
-  return gearUpFetch<GearListItem[]>("/gear", {
+export function listGear(query: GearCatalogQuery = {}) {
+  return campusGearFetch<GearItem[]>("/gear", {
     query: {
       providerId: query.providerId,
       search: query.search,
       category: query.category,
       brand: query.brand,
+      price: query.price,
       minPrice: query.minPrice,
       maxPrice: query.maxPrice,
       isAvailable: query.isAvailable,
@@ -32,8 +37,57 @@ export function listGear(query: GearListQuery = {}) {
       page: query.page ?? 1,
       limit: query.limit ?? 12,
     },
-    // Stock and availability change often; keep the window short.
-    next: { revalidate: 60, tags: ["gear"] },
+    next: {
+      revalidate: 60,
+      tags: ["gear"],
+    },
     fallbackMessage: "The gear catalog is reconnecting. Try again shortly.",
+  });
+}
+
+export function getGearItem(id: string) {
+  return campusGearFetch<GearDetail>(`/gear/${id}`, {
+    next: {
+      revalidate: 60,
+      tags: ["gear", `gear:${id}`],
+    },
+    fallbackMessage: "The gear listing couldn't be loaded. Try again shortly.",
+  });
+}
+
+export function getGearItemForMutation(id: string) {
+  return campusGearFetch<GearDetail>(`/gear/${id}`, {
+    cache: "no-store",
+    fallbackMessage:
+      "The latest gallery could not be loaded. Refresh the page and try again.",
+  });
+}
+
+export function createGearItem(input: CreateGearInput) {
+  return campusGearFetch<GearItem>("/gear", {
+    method: "POST",
+    auth: true,
+    cache: "no-store",
+    json: input,
+    fallbackMessage: "The gear listing couldn't be created. Try again shortly.",
+  });
+}
+
+export function updateGearItem(id: string, input: UpdateGearInput) {
+  return campusGearFetch<GearItem>(`/gear/${id}`, {
+    method: "PATCH",
+    auth: true,
+    cache: "no-store",
+    json: input,
+    fallbackMessage: "The gear listing couldn't be updated. Try again shortly.",
+  });
+}
+
+export function deleteGearItem(id: string) {
+  return campusGearFetch<GearItem>(`/gear/${id}`, {
+    method: "DELETE",
+    auth: true,
+    cache: "no-store",
+    fallbackMessage: "The gear listing couldn't be deleted. Try again shortly.",
   });
 }

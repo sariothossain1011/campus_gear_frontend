@@ -1,4 +1,4 @@
-# GearUp backend API — frontend integration reference
+# Campus Gear backend API — frontend integration reference
 
 The contract the Campus Gear frontend codes against. It is derived from the
 Express backend in `backend/` (repo `AbulBashar38/ph-backend-assignment`).
@@ -21,9 +21,9 @@ If the backend and this file disagree, update this file in the same change.
 
 ## 1. Connection
 
-- Base URL env var: `GEARUP_API_URL`, **including `/api`**, no trailing slash.
-  - Local: `GEARUP_API_URL=http://localhost:8080/api` (backend `npm run dev` in `backend/`)
-  - Deployed: `GEARUP_API_URL=https://campus-gear-backend-1.onrender.com/api`
+- Base URL env var: `CAMPUS_GEAR_API_URL`, **including `/api`**, no trailing slash.
+  - Local: `CAMPUS_GEAR_API_URL=http://localhost:8080/api` (backend `npm run dev` in `backend/`)
+  - Deployed: `CAMPUS_GEAR_API_URL=https://campus-gear-backend-1.onrender.com/api`
   - Put it in `.env.local` (git-ignored). It is server-only — never prefix it with `NEXT_PUBLIC_`.
 - Backend CORS allows only `APP_URL` (`http://localhost:3000`). This does not
   matter for calls made from the Next.js server, which is how this app calls the API.
@@ -51,7 +51,7 @@ Every endpoint responds with:
   (also for records outside the caller's scope), `409` conflict (duplicate
   email/phone, illegal status transition, role-change guard).
 
-`gearUpFetch` already unwraps this into `ApiResult<T>`
+`campusGearFetch` already unwraps this into `ApiResult<T>`
 (`{ ok: true, data, meta?, message, status } | { ok: false, error: ApiProblem }`).
 
 ## 3. Serialization rules
@@ -122,12 +122,12 @@ in the example config) and **refresh token** (7d). It also sets httpOnly cookies
 but those are set on the *backend's* domain and responses to server-side fetches
 never reach the browser. So the frontend owns its session:
 
-1. A Server Action calls `/auth/login` or `/auth/register` through `gearUpFetch`.
+1. A Server Action calls `/auth/login` or `/auth/register` through `campusGearFetch`.
 2. It stores `data.accessToken` and `data.refreshToken` in cookies named
    **`accessToken`** and **`refreshToken`** on the frontend domain via
    `(await cookies()).set(...)` — `httpOnly: true`, `sameSite: "lax"`,
    `secure` in production, `path: "/"`.
-3. Authenticated calls pass `auth: true` to `gearUpFetch`, which reads the
+3. Authenticated calls pass `auth: true` to `campusGearFetch`, which reads the
    `accessToken` cookie and sends `Authorization: Bearer <token>`.
 4. On `401` with a `refreshToken` cookie present, call `/auth/refresh-token`
    with `{ refreshToken }` in the body, overwrite the `accessToken` cookie, and

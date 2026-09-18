@@ -1,4 +1,3 @@
-
 export type DecimalValue = string | number;
 
 export type ApiMeta = {
@@ -7,63 +6,37 @@ export type ApiMeta = {
   total: number;
 };
 
-export type AuthTokens = {
-  accessToken: string;
-  refreshToken: string;
+export type ApiValidationIssue = {
+  path: string;
+  message: string;
 };
 
-export type RefreshedAccessToken = Pick<AuthTokens, "accessToken">;
-
-export type Role = "CUSTOMER" | "PROVIDER" | "ADMIN";
-
-export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
-
-/** Public sign-up can only create these; admins are created by other admins. */
-export type RegistrableRole = Exclude<Role, "ADMIN">;
-
-export type LoginInput = {
-  email: string;
-  password: string;
+export type ApiSuccess<T> = {
+  success: true;
+  statusCode: number;
+  message: string;
+  data: T;
+  meta?: ApiMeta;
 };
 
-export type RegisterInput = {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-  role: RegistrableRole;
+export type ApiFailure = {
+  success: false;
+  statusCode: number;
+  name?: string;
+  message: string;
+  errorDetails?: unknown;
+  path?: string;
+  date?: string;
 };
 
-/** `GET /auth/me` — the backend omits the password hash. */
-export type CurrentUser = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  role: Role;
-  status: UserStatus;
-  createdAt: string;
-  updatedAt: string;
-};
+export type FieldErrors = Record<string, string[]>;
 
-/**
- * What the header and other chrome know about the visitor without a network
- * call: claims decoded from the session cookie. Unverified — good for choosing
- * which links to show, never for authorizing anything.
- */
-export type SessionHint = {
-  name: string | null;
-  role: Role | null;
-};
-
-/**
- * Result the auth Server Actions hand back to the forms. Success redirects, so
- * only failures are ever returned.
- */
-export type AuthActionResult = {
-  ok: false;
+export type ApiProblem = {
+  status: number | null;
+  code: "configuration" | "network" | "http" | "invalid-response";
   message: string;
   fieldErrors?: FieldErrors;
+  retryable: boolean;
 };
 
 export type ApiResult<T> =
@@ -78,28 +51,6 @@ export type ApiResult<T> =
       ok: false;
       error: ApiProblem;
     };
-
-
-
-export type FieldErrors = Record<string, string[]>;
-
-export type ApiProblem = {
-  status: number | null;
-  code: "configuration" | "network" | "http" | "invalid-response";
-  message: string;
-  fieldErrors?: FieldErrors;
-  retryable: boolean;
-};
-
-export type RentalOrderStatus =
-  | "PLACED"
-  | "CONFIRMED"
-  | "PAID"
-  | "PICKED_UP"
-  | "RETURNED"
-  | "CANCELLED";
-
-export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED";
 
 export type Category = {
   id: string;
@@ -122,15 +73,148 @@ export type GearItem = {
   brand: string | null;
   createdAt: string;
   updatedAt: string;
-};
-
-/** `GET /gear` list rows. */
-export type GearListItem = GearItem & {
   category: Category;
-  provider: { id: string; name: string };
+  provider: {
+    id: string;
+    name: string;
+  };
 };
 
-export type Payment = {
+export type GearDetailReview = {
+  id: string;
+  rentalOrderId: string;
+  gearItemId: string;
+  customerId: string;
+  rating: DecimalValue;
+  comment: string | null;
+  createdAt: string;
+  updatedAt: string;
+  customer: {
+    id: string;
+    name: string;
+  };
+};
+
+export type GearDetail = Omit<GearItem, "provider"> & {
+  provider: GearItem["provider"] & {
+    email: string;
+  };
+  reviews: GearDetailReview[];
+};
+
+export type Review = {
+  id: string;
+  rentalOrderId: string;
+  gearItemId: string;
+  customerId: string;
+  rating: DecimalValue;
+  comment: string | null;
+  createdAt: string;
+  updatedAt: string;
+  gearItem: {
+    id: string;
+    name: string;
+    imageUrl: string | null;
+  };
+  customer: {
+    id: string;
+    name: string;
+  };
+  rentalOrder: {
+    id: string;
+    status: "RETURNED";
+    startDate: string;
+    endDate: string;
+  };
+};
+
+export type CreateReviewInput = {
+  orderId: string;
+  rating: number;
+  comment?: string;
+};
+
+export type ReviewMutationState = {
+  status: "idle" | "success" | "error";
+  message: string;
+  fieldErrors?: FieldErrors;
+  values?: {
+    rating?: string;
+    comment?: string;
+  };
+  data?: Review;
+};
+
+export type GearCatalogQuery = {
+  providerId?: string;
+  search?: string;
+  category?: string;
+  brand?: string;
+  price?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  isAvailable?: boolean;
+  inStock?: boolean;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+};
+
+export type GearPriceRange = {
+  minPrice: DecimalValue | null;
+  maxPrice: DecimalValue | null;
+};
+
+export type ReviewListQuery = {
+  search?: string;
+  gearItemId?: string;
+  rating?: number;
+  page?: number;
+  limit?: number;
+};
+
+export type Role = "CUSTOMER" | "PROVIDER" | "ADMIN";
+
+export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
+
+export type RentalOrderStatus =
+  | "PLACED"
+  | "CONFIRMED"
+  | "PAID"
+  | "PICKED_UP"
+  | "RETURNED"
+  | "CANCELLED";
+
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED";
+
+export type CurrentUser = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: Role;
+  status: UserStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AuthSessionSnapshot =
+  | {
+      status: "authenticated";
+      user: CurrentUser;
+    }
+  | {
+      status: "anonymous";
+      user: null;
+    }
+  | {
+      status: "unavailable";
+      user: null;
+      message: string;
+    };
+
+export type PaymentSummary = {
   id: string;
   rentalOrderId: string;
   amount: DecimalValue;
@@ -141,8 +225,7 @@ export type Payment = {
   updatedAt: string;
 };
 
-/** `GET /orders` and `GET /orders/:id` — scoped to the caller's role. */
-export type OrderDetail = {
+export type RentalOrder = {
   id: string;
   gearItemId: string;
   customerId: string;
@@ -154,16 +237,178 @@ export type OrderDetail = {
   createdAt: string;
   updatedAt: string;
   gearItem: GearItem & {
-    category: Category;
-    provider: { id: string; name: string; email: string };
+    provider: {
+      id: string;
+      name: string;
+      email: string;
+    };
   };
-  customer: { id: string; name: string; email: string; phone: string };
-  payment: Payment | null;
+  customer: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+  };
+  payment: PaymentSummary | null;
 };
 
-/** `GET /users` rows (admin only). */
+export type Payment = PaymentSummary & {
+  rentalOrder: Omit<RentalOrder, "payment">;
+};
+
+export type CheckoutSession = {
+  orderId: string;
+  paymentId: string;
+  paymentStatus: PaymentStatus;
+  stripeSessionId: string;
+  checkoutUrl: string;
+  reused: boolean;
+};
+
+export type CreateRentalOrderInput = {
+  gearItemId: string;
+  startDate: string;
+  endDate: string;
+  quantity: number;
+};
+
+export type CreatedRentalOrder = {
+  orderId: string;
+  status: "PLACED";
+  startDate: string;
+  endDate: string;
+  rentalDays: number;
+  quantity: number;
+  totalPrice: DecimalValue;
+  paymentStatus: "PENDING";
+};
+
+export type OrderMutationState = {
+  status: "idle" | "success" | "error";
+  message: string;
+  fieldErrors?: FieldErrors;
+  values?: Record<string, string>;
+  data?: CreatedRentalOrder;
+};
+
+export type UpdateUserInput = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  role?: Role;
+};
+
 export type AdminUser = CurrentUser & {
-  _count: { gearItems: number; rentalOrders: number; reviews: number };
+  _count: {
+    gearItems: number;
+    rentalOrders: number;
+    reviews: number;
+  };
 };
 
-export type PageQuery = { page?: number; limit?: number };
+export type OrderListQuery = {
+  search?: string;
+  status?: RentalOrderStatus;
+  paymentStatus?: PaymentStatus;
+  page?: number;
+  limit?: number;
+};
+
+export type PaymentListQuery = {
+  search?: string;
+  status?: PaymentStatus;
+  orderStatus?: RentalOrderStatus;
+  page?: number;
+  limit?: number;
+};
+
+export type UserListQuery = {
+  search?: string;
+  role?: Role;
+  status?: UserStatus;
+  page?: number;
+  limit?: number;
+};
+
+export type CreateAdminInput = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+};
+
+export type CreateGearInput = {
+  categoryId: string;
+  providerId?: string;
+  name: string;
+  description: string;
+  stock: number;
+  isAvailable: boolean;
+  pricePerDay: number;
+  imageUrl?: string | null;
+  imageUrls?: string[];
+  brand?: string | null;
+};
+
+export type UpdateGearInput = Omit<Partial<CreateGearInput>, "providerId">;
+
+export type AdminMutationState = {
+  status: "idle" | "success" | "error";
+  message: string;
+  fieldErrors?: FieldErrors;
+  values?: Record<string, string>;
+};
+
+// Public registration is limited to these two; ADMIN is created by an
+// existing admin through a separate protected endpoint.
+export type RegistrableRole = "CUSTOMER" | "PROVIDER";
+
+export type AuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export type RefreshedAccessToken = Pick<AuthTokens, "accessToken">;
+
+export type LoginInput = {
+  email: string;
+  password: string;
+};
+
+export type RegisterInput = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  role: RegistrableRole;
+};
+
+// Discriminated result the auth Server Actions return to `useActionState`.
+// Success is signalled by a redirect, so the returned state is only ever
+// "idle" (no submission yet) or "error".
+export type AuthFormState = {
+  status: "idle" | "error";
+  message: string;
+  fieldErrors?: FieldErrors;
+  values?: Record<string, string>;
+};
+
+/**
+ * What page chrome knows about the visitor without a network call: claims
+ * decoded from the session cookie. Unverified — good for choosing which links
+ * to show, never for authorizing anything.
+ */
+export type SessionHint = {
+  name: string | null;
+  role: Role | null;
+};
+
+/**
+ * Result the login/signup Server Actions hand back to the react-hook-form
+ * forms. Success redirects, so only failures are ever returned.
+ */
+export type AuthActionResult = {
+  ok: false;
+  message: string;
+  fieldErrors?: FieldErrors;
+};

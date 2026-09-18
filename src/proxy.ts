@@ -18,8 +18,8 @@ import {
 /**
  * Optimistic route guard. It only looks at the session cookies — it never
  * calls the backend, refreshes tokens, or verifies a signature (the frontend
- * has no signing secret). The real checks are `requireUser` in protected
- * layouts and the backend's own role guards.
+ * has no signing secret). The real checks are `requireDashboardUser`/`Role` in
+ * protected pages and the backend's own role guards.
  */
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;

@@ -11,7 +11,7 @@ type NextFetchOptions = {
   tags?: string[];
 };
 
-type GearUpFetchOptions = Omit<RequestInit, "body"> & {
+type CampusGearFetchOptions = Omit<RequestInit, "body"> & {
   query?: Record<string, QueryValue>;
   json?: unknown;
   next?: NextFetchOptions;
@@ -23,7 +23,7 @@ const DEFAULT_FAILURE_MESSAGE =
   "The gear desk is taking a trail break. Try again shortly.";
 
 function getApiBaseUrl() {
-  const configuredUrl = process.env.GEARUP_API_URL?.trim();
+  const configuredUrl = process.env.CAMPUS_GEAR_API_URL?.trim();
   if (!configuredUrl) return null;
 
   try {
@@ -73,9 +73,9 @@ function readMeta(value: unknown): ApiMeta | undefined {
   return { page, limit, total };
 }
 
-export async function gearUpFetch<T>(
+export async function campusGearFetch<T>(
   path: string,
-  options: GearUpFetchOptions = {},
+  options: CampusGearFetchOptions = {},
 ): Promise<ApiResult<T>> {
   const {
     query,
@@ -120,9 +120,9 @@ export async function gearUpFetch<T>(
         ok: false,
         error: normalizeApiProblem({
           status: 401,
-          payload: { message: "Sign in to access your GearUp workspace." },
+          payload: { message: "Sign in to access your Campus Gear workspace." },
           code: "http",
-          fallbackMessage: "Sign in to access your GearUp workspace.",
+          fallbackMessage: "Sign in to access your Campus Gear workspace.",
         }),
       };
     }

@@ -17,14 +17,28 @@ export const ROLE_HOME: Record<Role, string> = {
 export const DEFAULT_HOME = "/dashboard";
 
 /**
- * Dashboard areas only some roles may open. Paths not listed here (e.g. the
- * shared `/dashboard/account`) are open to every signed-in role. Proxy uses
- * this for a quick bounce; `requireRole` on each page is the real check.
+ * Dashboard areas only some roles may open; anything not listed (orders,
+ * payments, reviews, profile) is shared and scoped per role by the backend.
+ * Proxy uses this for a quick bounce; `requireDashboardRole(s)` on each page
+ * is the real check.
+ *
+ * Providers can read categories because gear forms need the taxonomy; every
+ * category mutation stays admin-only. Customers discover gear through the
+ * public `/gear` catalog, so `/dashboard/gear` is provider inventory and admin
+ * oversight only.
  */
 const ROLE_RESTRICTED_PREFIXES: readonly { prefix: string; roles: readonly Role[] }[] = [
   { prefix: "/dashboard/customer", roles: ["CUSTOMER"] },
   { prefix: "/dashboard/provider", roles: ["PROVIDER"] },
   { prefix: "/dashboard/admin", roles: ["ADMIN"] },
+  { prefix: "/dashboard/admins", roles: ["ADMIN"] },
+  { prefix: "/dashboard/users", roles: ["ADMIN"] },
+  { prefix: "/dashboard/categories", roles: ["ADMIN", "PROVIDER"] },
+  { prefix: "/dashboard/gear", roles: ["ADMIN", "PROVIDER"] },
+  // Placing a rental is a customer action; review moderation and per-listing
+  // feedback are provider/admin views.
+  { prefix: "/dashboard/orders/new", roles: ["CUSTOMER"] },
+  { prefix: "/dashboard/reviews", roles: ["ADMIN", "PROVIDER"] },
 ];
 
 function matchesPrefix(pathname: string, prefix: string) {

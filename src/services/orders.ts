@@ -1,22 +1,17 @@
 import "server-only";
 
 import type {
-  OrderDetail,
-  PageQuery,
-  PaymentStatus,
+  CheckoutSession,
+  CreatedRentalOrder,
+  CreateRentalOrderInput,
+  OrderListQuery,
+  RentalOrder,
   RentalOrderStatus,
 } from "@/lib/validations/types";
-import { gearUpFetch } from "./server-client";
+import { campusGearFetch } from "./server-client";
 
-export type OrderListQuery = PageQuery & {
-  search?: string;
-  status?: RentalOrderStatus;
-  paymentStatus?: PaymentStatus;
-};
-
-/** Role-scoped by the backend: customers see theirs, providers their gear's, admins all. */
 export function listOrders(query: OrderListQuery = {}) {
-  return gearUpFetch<OrderDetail[]>("/orders", {
+  return campusGearFetch<RentalOrder[]>("/orders", {
     auth: true,
     cache: "no-store",
     query: {
@@ -26,6 +21,46 @@ export function listOrders(query: OrderListQuery = {}) {
       page: query.page ?? 1,
       limit: query.limit ?? 10,
     },
-    fallbackMessage: "Rental orders couldn't be loaded. Try again shortly.",
+    fallbackMessage:
+      "Your rental orders couldn't be loaded. Try again shortly.",
+  });
+}
+
+export function getOrder(id: string) {
+  return campusGearFetch<RentalOrder>(`/orders/${id}`, {
+    auth: true,
+    cache: "no-store",
+    fallbackMessage: "This order couldn't be loaded. Try again shortly.",
+  });
+}
+
+export function createRentalOrder(input: CreateRentalOrderInput) {
+  return campusGearFetch<CreatedRentalOrder>("/orders", {
+    method: "POST",
+    auth: true,
+    cache: "no-store",
+    json: input,
+    fallbackMessage:
+      "Your rental request couldn't be placed. Check the dates and try again.",
+  });
+}
+
+export function createCheckoutSession(id: string) {
+  return campusGearFetch<CheckoutSession>(`/orders/${id}/checkout-session`, {
+    method: "POST",
+    auth: true,
+    cache: "no-store",
+    fallbackMessage:
+      "Checkout couldn't be started. Confirm the order is ready to pay and try again.",
+  });
+}
+
+export function updateOrderStatus(id: string, status: RentalOrderStatus) {
+  return campusGearFetch<RentalOrder>(`/orders/${id}/status`, {
+    method: "PATCH",
+    auth: true,
+    cache: "no-store",
+    json: { status },
+    fallbackMessage: "The order status couldn't be updated. Try again shortly.",
   });
 }

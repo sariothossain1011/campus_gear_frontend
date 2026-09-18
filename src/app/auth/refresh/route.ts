@@ -25,7 +25,7 @@ function endSession(request: NextRequest, returnTo: string) {
 /**
  * Renews the access token, then resumes the page that needed it.
  *
- * Server Components cannot write cookies, so `requireUser` redirects here when
+ * Server Components cannot write cookies, so `requireDashboardUser` redirects here when
  * the backend rejects the access token. Every failure clears both cookies and
  * ends at the login page, which is what stops a redirect loop.
  */

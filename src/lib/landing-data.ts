@@ -89,6 +89,9 @@ export type Category = {
   href: string;
 };
 
+// Placeholder tiles: these names don't exist in the backend yet, so each one
+// opens the full catalog rather than an empty filtered result. Once the section
+// renders `GET /categories`, link to `/gear?category=<id>` instead.
 export const categories: Category[] = [
   {
     name: "Electronics",
@@ -96,7 +99,7 @@ export const categories: Category[] = [
     itemCount: 128,
     icon: Laptop,
     tone: "sky",
-    href: "/gear/electronics",
+    href: "/gear",
   },
   {
     name: "Study & Academic",
@@ -104,7 +107,7 @@ export const categories: Category[] = [
     itemCount: 94,
     icon: Calculator,
     tone: "sage",
-    href: "/gear/study-academic",
+    href: "/gear",
   },
   {
     name: "Sports",
@@ -112,7 +115,7 @@ export const categories: Category[] = [
     itemCount: 76,
     icon: Volleyball,
     tone: "lime",
-    href: "/gear/sports",
+    href: "/gear",
   },
   {
     name: "Entertainment",
@@ -120,7 +123,7 @@ export const categories: Category[] = [
     itemCount: 41,
     icon: Gamepad2,
     tone: "sun",
-    href: "/gear/entertainment",
+    href: "/gear",
   },
   {
     name: "Photography",
@@ -128,7 +131,7 @@ export const categories: Category[] = [
     itemCount: 33,
     icon: Camera,
     tone: "orange",
-    href: "/gear/photography",
+    href: "/gear",
   },
   {
     name: "Campus Essentials",
@@ -136,7 +139,7 @@ export const categories: Category[] = [
     itemCount: 58,
     icon: Tent,
     tone: "mist",
-    href: "/gear/campus-essentials",
+    href: "/gear",
   },
 ];
 
@@ -162,6 +165,8 @@ export function formatTaka(amount: number): string {
   return `৳${amount.toLocaleString("en-BD")}`;
 }
 
+// Placeholder listings with no backend id; they open the catalog until this
+// section renders real `GET /gear` results linking to `/gear/<id>`.
 export const featuredItems: RentalItem[] = [
   {
     name: "MacBook Air M1",
@@ -175,7 +180,7 @@ export const featuredItems: RentalItem[] = [
     availabilityNote: "Available today",
     icon: Laptop,
     tone: "sky",
-    href: "/gear/macbook-air-m1",
+    href: "/gear",
   },
   {
     name: "Cricket Bat — English Willow",
@@ -189,7 +194,7 @@ export const featuredItems: RentalItem[] = [
     availabilityNote: "Available today",
     icon: CricketBatGlyph,
     tone: "lime",
-    href: "/gear/cricket-bat-english-willow",
+    href: "/gear",
   },
   {
     name: "Scientific Calculator",
@@ -203,7 +208,7 @@ export const featuredItems: RentalItem[] = [
     availabilityNote: "Available today",
     icon: Calculator,
     tone: "sage",
-    href: "/gear/scientific-calculator",
+    href: "/gear",
   },
   {
     name: "Canon EOS 200D DSLR",
@@ -217,7 +222,7 @@ export const featuredItems: RentalItem[] = [
     availabilityNote: "Next free Thu",
     icon: Camera,
     tone: "orange",
-    href: "/gear/canon-eos-200d",
+    href: "/gear",
   },
   {
     name: "Sony WH-1000XM4",
@@ -231,7 +236,7 @@ export const featuredItems: RentalItem[] = [
     availabilityNote: "Available today",
     icon: Headphones,
     tone: "mist",
-    href: "/gear/sony-wh-1000xm4",
+    href: "/gear",
   },
   {
     name: "Carrom Board (Full Size)",
@@ -245,7 +250,7 @@ export const featuredItems: RentalItem[] = [
     availabilityNote: "2 left this week",
     icon: Gamepad2,
     tone: "sun",
-    href: "/gear/carrom-board",
+    href: "/gear",
   },
 ];
 
