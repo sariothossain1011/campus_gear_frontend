@@ -25,6 +25,20 @@ export function listReviews(query: ReviewListQuery = {}) {
   });
 }
 
+/** Customer-only: edit a review on one of their own returned orders. */
+export function updateReview(
+  id: string,
+  input: { rating?: number; comment?: string | null },
+) {
+  return campusGearFetch<Review>(`/reviews/${id}`, {
+    method: "PATCH",
+    auth: true,
+    cache: "no-store",
+    json: input,
+    fallbackMessage: "Your review couldn't be updated. Try again shortly.",
+  });
+}
+
 export function deleteReview(id: string) {
   return campusGearFetch<Review>(`/reviews/${id}`, {
     method: "DELETE",

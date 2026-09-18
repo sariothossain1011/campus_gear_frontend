@@ -4,6 +4,7 @@ import {
   ClipboardList,
   CreditCard,
   LayoutDashboard,
+  Search,
   Star,
   Tags,
   UserRound,
@@ -52,9 +53,13 @@ export const DASHBOARD_NAVIGATION: Record<
       href: "/dashboard/payments",
       icon: CreditCard,
     },
-    // No gear entry: customers discover gear through the public `/gear`
-    // catalog, which the customer overview links to. `/dashboard/gear` is the
-    // provider/admin inventory register.
+    // Customers rent from the public catalog, so this leaves the dashboard.
+    // `/dashboard/gear` is the provider/admin inventory register instead.
+    {
+      label: "Find gear",
+      href: "/gear",
+      icon: Search,
+    },
     PROFILE_ITEM,
   ],
   PROVIDER: [
